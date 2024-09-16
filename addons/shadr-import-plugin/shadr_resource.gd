@@ -5,10 +5,10 @@ extends Resource
 enum ObservationType {GRAVITY_FIELD, TOPOGRAPHY}
 enum NormalizationState {UNNORMALIZED, NORMALIZED, OTHER}
 
-var target_name : String
-var observation_type : ObservationType
-var original_product_id : String
-var product_id : String
+@export var target_name : String
+@export var observation_type : ObservationType
+@export var original_product_id : String
+@export var product_id : String
 
 var reference_radius : float ## km
 var reference_gm : float ## Gravitational parameter. km³/s²
