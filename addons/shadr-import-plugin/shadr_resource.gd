@@ -19,8 +19,8 @@ enum NormalizationState {UNNORMALIZED, NORMALIZED, OTHER}
 @export var reference_longitude : float
 @export var reference_latitude : float
 
-var coefficients : PackedFloat64Array
-var uncertainty_coefficients : PackedFloat64Array
+@export var coefficients : PackedFloat64Array
+@export var uncertainty_coefficients : PackedFloat64Array
 
 
 
