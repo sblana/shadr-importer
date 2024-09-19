@@ -32,7 +32,6 @@ func _get_preset_count() -> int:
 func _get_import_order() -> int:
 	return 0
 
-
 func _get_preset_name(preset_index: int) -> String:
 	return PRESET_NAMES[preset_index]
 
@@ -74,6 +73,7 @@ func _import(header_path: String, save_path: String, options: Dictionary, r_plat
 	return ResourceSaver.save(shadr, "%s.%s" % [save_path, _get_save_extension()])
 
 
+# HACK
 func parse_label_header(file : FileAccess, shadr : SHADR) -> void:
 	var cur_line : String
 	for key in KEYWORDS:
@@ -142,7 +142,6 @@ func parse_table_header(table_file : FileAccess, shadr : SHADR) -> void:
 
 func parse_table_body(table_file : FileAccess, shadr : SHADR) -> void:
 	## SHADR Spec 4.2.2.2 "The structure outlined in the Definition below should not vary."
-	var t := Time.get_ticks_msec()
 	var coefficients2D : Array[PackedFloat64Array] = SHHelper.new_SH2f64Array2D(shadr.field_degree)
 	var uncertainty2D : Array[PackedFloat64Array] = SHHelper.new_SH2f64Array2D(shadr.field_degree)
 	var splits : PackedStringArray = table_file.get_csv_line(',')
@@ -151,7 +150,7 @@ func parse_table_body(table_file : FileAccess, shadr : SHADR) -> void:
 	## SHADR Spec 4.2.2.3 "No requirements are placed on the order in which coefficient values
 	## appear in the table or that all possible combinations of the pairs {m,n} be included."
 	while table_file.get_position() < table_file.get_length():
-		splits = table_file.get_csv_line(',')
+		splits = table_file.get_csv_line()
 		lm = Vector2i(splits[0].to_int(), splits[1].to_int()*2)
 		coefficients2D[lm.x][lm.y] = splits[2].to_float()
 		coefficients2D[lm.x][lm.y+1] = splits[3].to_float()
@@ -159,29 +158,4 @@ func parse_table_body(table_file : FileAccess, shadr : SHADR) -> void:
 		uncertainty2D[lm.x][lm.y+1] = splits[5].to_float()
 	shadr.coefficients = SHHelper.SH2f64Array2D_to_SH2f64Array1D(coefficients2D)
 	shadr.uncertainty_coefficients = SHHelper.SH2f64Array2D_to_SH2f64Array1D(uncertainty2D)
-	return
-
-
-
-func aaaaparse_table_body(table_file : FileAccess, shadr : SHADR) -> void:
-	## SHADR Spec 4.2.2.2 "The structure outlined in the Definition below should not vary."
-	table_file.seek(0)
-	var coefficients : PackedFloat64Array
-	var coefficients2D : Array[PackedFloat64Array]
-	var uncertainty_coefficients : PackedFloat64Array
-	var uncertainty2D : Array[PackedFloat64Array]
-	
-	
-	var splits : PackedStringArray = table_file.get_csv_line(',')
-	coefficients.append_array([0.0, 0.0])
-	uncertainty_coefficients.append_array([0.0, 0.0])
-	
-	## SHADR Spec 4.2.2.3 "No requirements are placed on the order in which coefficient values
-	## appear in the table or that all possible combinations of the pairs {m,n} be included."
-	for i in SHHelper.get_harmonics_amount(shadr.field_degree)-1:
-		splits = table_file.get_csv_line(',')
-		coefficients.append_array([splits[2].to_float(), splits[3].to_float()])
-		uncertainty_coefficients.append_array([splits[4].to_float(), splits[5].to_float()])
-	shadr.coefficients = coefficients
-	shadr.uncertainty_coefficients = uncertainty_coefficients
 	return
